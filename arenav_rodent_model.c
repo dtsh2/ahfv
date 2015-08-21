@@ -1,4 +1,4 @@
-/* pomp model file: seir filo */
+/* pomp model file: seir arena */
 
   #include <R.h>
   #include <Rmath.h>
