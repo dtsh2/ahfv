@@ -94,13 +94,13 @@
 
 // balance the equations
 
-  SUSJ += trans[0]-trans[1]-trans[2]-trans[3];  	// IN births; OUT juv mort, aging, inf
-  EXPJ += trans[2]-trans[4]-trans[5]-trans[6];  	// IN inf; OUT incubation and juv mort, aging
-  INFJ += trans[4]-trans[7]-trans[8]-trans[9];  	// IN / OUT
-  RECJ += trans[7]-trans[10]-trans[11]; 		// IN /OUT 
-  SUSA += trans[1]-trans[12]-trans[13]; 		// IN / OUT
-  EXPA += trans[12]+trans[6]-trans[14]-trans[15]; 	// IN /OUT
-  INFA += trans[14]+trans[8]-trans[16]-trans[17]; 	// IN / OUT
-  RECA += trans[16]+trans[10]-trans[18]; 		// IN from serconverstion & aging; OUT from death
+  SUSJ += trans[0]-trans[1]-trans[2]-trans[3];  	// IN births / OUT juv mortality, aging, inf exp
+  EXPJ += trans[2]-trans[4]-trans[5]-trans[6];  	// IN inf exp / OUT incubation, juv mortality, aging
+  INFJ += trans[4]-trans[7]-trans[8]-trans[9];  	// IN inc / OUT juv mortality, aging, seroconversion
+  RECJ += trans[7]-trans[10]-trans[11]; 			// IN serocon /OUT juv mortality, aging
+  SUSA += trans[1]-trans[12]-trans[13]; 			// IN aging / OUT mortality, inf exp
+  EXPA += trans[12]+trans[6]-trans[14]-trans[15]; 	// IN inf exp, aging / OUT incubation, mortality
+  INFA += trans[14]+trans[8]-trans[16]-trans[17]; 	// IN inc, aging / OUT seroconv, mortality
+  RECA += trans[16]+trans[10]-trans[18]; 			// IN from serconverstion, aging / OUT from death
 
 }

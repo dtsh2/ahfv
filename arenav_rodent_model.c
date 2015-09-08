@@ -6,7 +6,6 @@
   #include <C:/Users/David Hayman/Documents/R/win-library/3.0/pomp/include/pomp.h>
 
 // define parameters
-// TO DO CHANGE NAMES
 
   #define KAPPA	    (p[parindex[0]]) 			// birth rate (peak size)
   #define S	    	(p[parindex[1]]) 			// synchrony
@@ -43,8 +42,8 @@
 {
 
   int nrate = 16; 					// number of rates
-  double rate[nrate];					// transition rates
-  double trans[nrate];					// transition numbers
+  double rate[nrate];				// transition rates
+  double trans[nrate];				// transition numbers
   double NCa = x[1]+x[4];			// Carrier population size
   double NIa = x[4]+x[6];			// Infected adult population size
   double NAd = x[5]+x[7];			// Breeding adult population size (non-infected)
@@ -96,13 +95,13 @@
 
 // balance the equations
 
-  SUSJ += trans[0]-trans[1]-trans[2]-trans[3];  	// IN births; OUT juv mort, aging, inf
-  CARJ += trans[4]-trans[5]-trans[6];  	// IN births; OUT aging, juv mortality
-  INFJ += trans[2]-trans[7]-trans[8];  	// IN inf j / OUT seroconversion, juv mortality
-  RECJ += trans[7]-trans[9]-trans[10]; 			// IN sero j /OUT  aging, juv mortality
-  CARA += trans[5]-trans[11]-trans[12]; 	// IN aging /OUT ad mortality
+  SUSJ += trans[0]-trans[1]-trans[2]-trans[3];  	// IN births / OUT juv mortality, aging, inf
+  CARJ += trans[4]-trans[5]-trans[6];  				// IN births / OUT aging, juv mortality
+  INFJ += trans[2]-trans[7]-trans[8];  				// IN inf / OUT seroconversion, juv mortality
+  RECJ += trans[7]-trans[9]-trans[10]; 				// IN seroconv / OUT  aging, juv mortality
+  CARA += trans[5]-trans[11]-trans[12]; 			// IN aging / OUT ad mortality
   SUSA += trans[1]-trans[12]-trans[13]; 			// IN aging / OUT inf, ad mortality
-  INFA += trans[14]-trans[14]-trans[15]; 	// IN inf / OUT aging, juv mortality
-  RECA += trans[14]+trans[9]-trans[16]; 			// IN from serconverstion & aging; OUT from death
+  INFA += trans[14]-trans[14]-trans[15]; 			// IN inf / OUT aging, ad mortality
+  RECA += trans[14]+trans[9]-trans[16]; 			// IN serconv, aging / OUT ad mortality
 
 }
