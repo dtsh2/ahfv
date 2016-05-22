@@ -1,0 +1,107 @@
+# filovirus
+pomp(
+  data = data.frame(
+    time=seq(from=0,to=365*20,by=1),  # time for simulations to run
+    X = NA # dummy variables
+  ),
+  times='time',
+  t0=0,
+  rprocess=euler.sim(step.fun="sir_euler_simulator",delta.t=1),
+  rmeasure="binomial_rmeasure",
+  dmeasure="binomial_dmeasure",
+  
+  statenames=c(
+    "SUSJ","EXPJ","INFJ", "RECJ", "SUSA","EXPA","INFA","RECA"),
+  states=c(
+    "SUSJ","EXPJ","INFJ", "RECJ", "SUSA","EXPA","INFA","RECA"),
+  ## the order of the parameters assumed in the native routines:
+  paramnames=c(
+    'BETA',
+    'MU',
+    "DELTA",
+    "SIGMA",
+    "K",
+    'EPSILON',
+    'TAU',
+    'KAPPA',
+    'S',
+    'OMEGA',
+    "PHI",
+    "SUSJ.0","EXPJ.0","INFJ.0", "RECJ.0", "SUSA.0","EXPA.0","INFA.0","RECA.0"),
+  initializer=function(params,t0,states,...){
+    x0<-params[paste(states,".0",sep="")]
+    names(x0)<-states
+    return(x0)
+  }
+) -> seir
+
+#define BETA      (p[parindex[0]]) 			// transmission rate
+#define MU        (p[parindex[1]]) 			// adult death rate
+#define DELTA     (p[parindex[2]]) 			// juvenile mortality rate
+#define SIGMA	    (p[parindex[3]]) 			// incubation period
+#define K	    	  (p[parindex[4]]) 			// carrying capacity 
+#define EPSILON   (p[parindex[5]]) 			// rate of juvenile aging
+#define TAU	      (p[parindex[6]]) 			// seroconversion
+#define KAPPA	    (p[parindex[7]]) 			// birth rate (peak size)
+#define S	    	  (p[parindex[8]]) 			// synchrony
+#define OMEGA	    (p[parindex[9]]) 			// pulse per yr
+#define PHI	      (p[parindex[10]]) 			// timing during year
+
+params <- c(
+  BETA=0.0045,
+  MU=5.1*10^-4,
+  DELTA=2.31*10^-3,
+  SIGMA=1/21,
+  K= 1000,
+  EPSILON=0.5/365,
+  TAU=1/7,
+  KAPPA=4.1*10^-3,
+  S=14.35,
+  OMEGA=1/365,
+  PHI=0.5,
+  SUSJ.0=10000,EXPJ.0=1000,INFJ.0=1000,RECJ.0=1000,
+  SUSA.0=10000, EXPA.0=1000,INFA.0=1000, RECA.0=1000) # this adds to the initial conditions given the state variables
+
+sim <- simulate(seir,params=c(params),seed=3493895L,
+                nsim=10,states=T,obs=F,as.data.frame=T) # 
+class(seir) # pomp object
+class(sim) # data frame - even if I remove "as.data.frame" in the above code (sim)
+#sim <- simulate(sir,params=c(params),nsim=1,states=T,obs=F)#,as.data.frame=T) # saves as an array
+matplot(sim[1:7301,1:8],type='l')
+
+# select all the first times with infection extinct
+head(sim)
+sim[is.na(sim)] <- 0
+
+data.filtered <- sim[rowSums(sim[,c(2,3,6,7)])==0,]
+min_t<- data.filtered[!duplicated(data.filtered$sim),]$time
+
+paramset<-cbind(params,params)
+
+##########################################################33
+# for all parameter sets....
+results<-array(NA,dim=c(2,10)) # paramet sets, sims
+
+for (j in 1:length(paramset[1,])){
+  out <-simulate(seir,params=c(paramset[,j]),
+                 seed=1493885L,nsim=10,states=T,obs=F,as.data.frame=T) #
+  out[is.na(out)] <- 0
+  data.filtered <- out[rowSums(out[,c(2,3,6,7)])==0,]
+  min_t<- data.filtered[!duplicated(data.filtered$sim),]$time
+  results[j,]<-ifelse(sum(min_t)==0,max(out$time),min_t)
+}
+#
+
+row.names(results)<-c("par1","par2")
+
+library(reshape2)
+library(ggplot2)
+
+res<-melt(results)
+ggplot(data = res, aes(x=c(Var1), y=value))+
+ theme(legend.position="none") +
+  geom_boxplot(aes(fill=Var1)) +
+                 ggtitle("Extinction") +
+                 labs(x="Parameter set",y="Time to extinction")
+  
+# plot(rowMeans(results[1:2,]),paramset[1,])
